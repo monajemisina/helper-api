@@ -9,8 +9,11 @@ interface VendorParams {
 }
 
 export const fetchAllVendors = async (params: VendorParams): Promise<any> => {
-  
-  const response = await axios.get(`${process.env.FEROOT_API_VENDOR_URL}`, {
+  const vendorApi = process.env.FEROOT_API_VENDOR_URL as string
+  if (!vendorApi) {
+    throw new Error("FEROOT_API_VENDOR_URL is not defined in environment variables");
+  }
+  const response = await axios.get(vendorApi, {
     params,
     headers: {
       'Content-Type': 'application/json',

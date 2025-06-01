@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { fetchAllScripts } from '../services/script.service';
 import { extractFerootUuids } from '../utils/urlUtils';
+import { getSegmentedPatterns } from '../utils/grouping.util';
 
 const getAllScripts = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -20,15 +21,19 @@ const getAllScripts = async (req: Request, res: Response): Promise<void> => {
       endDate,
       projectUuids: [projectUuid],
       dataSourceUuids: [dataSourceUuid],
-      limit: 10,
+      limit: 1000,
       page: 1,
     });
     const scriptUrls = data.items.map((item: any) => item.scriptUrl);
-    const scriptCount = scriptUrls.length;
-
+    const totalCount = scriptUrls.length;
+    const segmentedScripts = getSegmentedPatterns({
+      urls: scriptUrls,
+      totalCount
+    });
     res.status(200).send({
       scriptUrls,
-      totalCount: scriptCount
+      totalCount,
+      segmentedScripts
     });
 
   } catch (error: any) {
@@ -38,7 +43,7 @@ const getAllScripts = async (req: Request, res: Response): Promise<void> => {
       data: error.response?.data,
     });
 
-    res.status(error.response?.status || 500).json({
+    res.status(error.response?.status || 500).send({
       error: error.message,
       details: error.response?.data || 'Unexpected error',
     });

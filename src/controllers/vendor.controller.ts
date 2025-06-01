@@ -24,7 +24,7 @@ export const getAllVendors = async (req: Request, res: Response): Promise<void> 
       categories: ["adv", "cdn", "development"],
     });
 
-    res.status(200).json(data);
+    res.status(200).send(data);
 
   } catch (error: any) {
     console.error("Error fetching Feroot vendors:", {
@@ -33,7 +33,7 @@ export const getAllVendors = async (req: Request, res: Response): Promise<void> 
       data: error.response?.data,
     });
 
-    res.status(error.response?.status || 500).json({
+    res.status(error.response?.status || 500).send({
       error: error.message,
       details: error.response?.data || "Unexpected error",
     });

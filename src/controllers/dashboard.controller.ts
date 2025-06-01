@@ -10,13 +10,11 @@ const getDashboard = async (req: Request, res: Response): Promise<void> => {
     const sourceUrl = process.env.FEROOT_SOURCE_URL as string;
 
     if (!sourceUrl) {
-      res.status(400).json({ error: "source url is not defined" });
+      res.status(400).json({ error: "FEROOT_SOURCE_URL is not defined" });
       return;
     }
     
     const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
-
-
     const dashboardData = await fetchDashboard({
       projectUuids: [projectUuid],
       dataSourceUuids: [dataSourceUuid],
@@ -24,15 +22,15 @@ const getDashboard = async (req: Request, res: Response): Promise<void> => {
       endDate,
     });
 
-    res.status(200).json(dashboardData);
+    res.status(200).send(dashboardData);
   } catch (error: any) {
-    console.error("Error fetching Feroot vendors:", {
+    console.error("Error fetching Feroot dashboard:", {
       message: error.message,
       status: error.response?.status,
       data: error.response?.data,
     });
 
-    res.status(error.response?.status || 500).json({
+    res.status(error.response?.status || 500).send({
       error: error.message,
       details: error.response?.data || "Unexpected error",
     });
