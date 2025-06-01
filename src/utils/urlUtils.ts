@@ -1,8 +1,4 @@
 export const extractFerootUuids = (url: string): { projectUuid: string; dataSourceUuid: string } => {
-  if (!url?.trim()) {
-    throw new Error("URL parameter is required");
-  }
-
   try {
     const parsedUrl = new URL(url);
     const path = parsedUrl.hash || "";
@@ -19,5 +15,3 @@ export const extractFerootUuids = (url: string): { projectUuid: string; dataSour
     throw new Error("Invalid URL format");
   }
 };
-
-
