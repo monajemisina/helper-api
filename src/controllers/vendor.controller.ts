@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { fetchAllVendors } from '../services/vendor.service';
-import { extractFerootUuids } from '../utils/url.util';
+import { extractFerootUuids } from '../utils/urlUuidExtractor';
 
 export const getAllVendors = async (req: Request, res: Response): Promise<void> => {
   try {
 
     const endDate = Date.now();
-    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // last 30 days
+    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
 
     const sourceUrl = process.env.FEROOT_SOURCE_URL as string;
     if (!sourceUrl) {

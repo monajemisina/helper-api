@@ -1,4 +1,5 @@
 import axios from 'axios';
+import apiClient from '../utils/apiClient';
 
 interface ScriptParams {
   startDate: number;
@@ -14,17 +15,6 @@ interface ScriptParams {
 }
 
 export const fetchAllScripts = async (params: ScriptParams): Promise<any> => {
-  const scriptApi = process.env.FEROOT_API_SCRIPT_URL as string;
-  if (!scriptApi) {
-    throw new Error("FEROOT_API_SCRIPT_URL is not defined in environment variables");
-  }
-  const response = await axios.get(scriptApi, {
-    params,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-KEY': process.env.FEROOT_API_KEY || '',
-    },
-  });
-
+  const response = await apiClient.get('/scripts', { params });
   return response.data;
 };

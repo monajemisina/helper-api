@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { fetchAllScripts } from '../services/script.service';
-import { extractFerootUuids } from '../utils/url.util';
-import { getSegmentedPatterns } from '../utils/grouping.util';
+import { extractFerootUuids } from '../utils/urlUuidExtractor';
+import { getSegmentedPatterns } from '../utils/urlPatternUtils';
 
 const getAllScripts = async (req: Request, res: Response): Promise<void> => {
   try {
     
     const endDate = Date.now();
-    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days ago
+    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
     const sourceUrl = process.env.FEROOT_SOURCE_URL;
 
     if (!sourceUrl) {
@@ -24,7 +24,7 @@ const getAllScripts = async (req: Request, res: Response): Promise<void> => {
       limit: 1000,
       page: 1,
     });
-    const scriptUrls = data.items.map((item: any) => item.scriptUrl);
+    const scriptUrls = data.items.map((item: any) => item.scriptUrl).sort();
     const totalCount = scriptUrls.length;
     const segmentedScripts = getSegmentedPatterns({
       urls: scriptUrls,
