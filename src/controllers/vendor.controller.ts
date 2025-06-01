@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { fetchAllVendors } from '../services/vendor.service';
-import { extractFerootUuids } from '../utils/urlUtils';
+import { extractFerootUuids } from '../utils/url.util';
 
 export const getAllVendors = async (req: Request, res: Response): Promise<void> => {
   try {

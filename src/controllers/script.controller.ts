@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { fetchAllScripts } from '../services/script.service';
-import { extractFerootUuids } from '../utils/urlUtils';
+import { extractFerootUuids } from '../utils/url.util';
 import { getSegmentedPatterns } from '../utils/grouping.util';
 
 const getAllScripts = async (req: Request, res: Response): Promise<void> => {

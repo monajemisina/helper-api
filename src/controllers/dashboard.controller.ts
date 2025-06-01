@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { fetchDashboard } from '../services/dashboard.service';
-import { extractFerootUuids } from '../utils/urlUtils';
+import { extractFerootUuids } from '../utils/url.util';
 
 const getDashboard = async (req: Request, res: Response): Promise<void> => {
   try {
