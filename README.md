@@ -33,7 +33,6 @@ Go to your Feroot dashboard, navigate to Data Sources, and click on the specific
 Command	Description
 npm run dev	Start the dev server
 npm run build	Compile TypeScript
-npm run lint	Run ESLint for code quality
 
 📦 Tech Stack
 Node.js
