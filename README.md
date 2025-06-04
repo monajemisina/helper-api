@@ -16,11 +16,9 @@ npm install
 3. Configure Environment Variables
 Create a .env file in the root directory with the following keys:
 
-env
-Copy
-Edit
 # API Endpoints
 FEROOT_API_BASE_URL= https://app.feroot.com/api/v1/platform
+
 # API Authentication
 FEROOT_API_KEY=
 How to find:
