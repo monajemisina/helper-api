@@ -20,16 +20,16 @@ env
 Copy
 Edit
 # API Endpoints
-FEROOT_API_SCRIPT_URL=
-FEROOT_API_VENDOR_URL=
-FEROOT_API_DASH_URL=
-FEROOT_API_BASE_URL=
-
+FEROOT_API_BASE_URL= https://app.feroot.com/api/v1/platform
 # API Authentication
 FEROOT_API_KEY=
+How to find:
+Go to your Feroot tenant, navigate to Settings → Account → Developer, and click Create API Key to generate one.
 
 # Source URL for extracting UUIDs
 FEROOT_SOURCE_URL=
+How to find:
+Go to your Feroot dashboard, navigate to Data Sources, and click on the specific crawler. You’ll be able to copy the full source URL from the browser.
 
 🛠 Scripts
 Command	Description
