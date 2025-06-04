@@ -26,14 +26,14 @@ const getAllScripts = async (req: Request, res: Response): Promise<void> => {
     });
     const scriptUrls = data.items.map((item: any) => item.scriptUrl).sort();
     const totalCount = scriptUrls.length;
-    const segmentedScripts = getSegmentedPatterns({
-      urls: scriptUrls,
-      totalCount
-    });
+    // const segmentedScripts = getSegmentedPatterns({
+    //   urls: scriptUrls,
+    //   totalCount
+    // }); not functional yet
+    
     res.status(200).send({
       scriptUrls,
       totalCount,
-      segmentedScripts
     });
 
   } catch (error: any) {
@@ -45,7 +45,7 @@ const getAllScripts = async (req: Request, res: Response): Promise<void> => {
 
     res.status(error.response?.status || 500).send({
       error: error.message,
-      details: error.response?.data || 'Unexpected error',
+      details: error.response?.data || 'Unexpected error - scripts',
     });
   }
 

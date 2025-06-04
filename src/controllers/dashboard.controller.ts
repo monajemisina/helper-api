@@ -32,7 +32,7 @@ const getDashboard = async (req: Request, res: Response): Promise<void> => {
 
     res.status(error.response?.status || 500).send({
       error: error.message,
-      details: error.response?.data || "Unexpected error",
+      details: error.response?.data || "Unexpected error - dashboard",
     });
   }
 };

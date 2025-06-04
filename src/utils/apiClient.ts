@@ -1,7 +1,6 @@
 import axios from 'axios';
  
 if (!process.env.FEROOT_API_KEY) {
-    console.log(process.env.FEROOT_API_KEY)
   throw new Error('FEROOT_API_KEY is not defined in your environment');
 }
 if (!process.env.FEROOT_API_BASE_URL) {

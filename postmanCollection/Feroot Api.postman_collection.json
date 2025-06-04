@@ -1,0 +1,62 @@
+{
+	"info": {
+		"_postman_id": "a616e3c0-d8e5-44f0-8efa-c7e138fe0a9d",
+		"name": "Feroot Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45518509",
+		"_collection_link": "https://sinamon-6058810.postman.co/workspace/Sina-Mon's-Workspace~7be75aec-3f0e-489c-87cb-43629edb8821/collection/45518509-a616e3c0-d8e5-44f0-8efa-c7e138fe0a9d?action=share&source=collection_link&creator=45518509"
+	},
+	"item": [
+		{
+			"name": "Get All Scripts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{homeUrl}}/scripts",
+					"host": [
+						"{{homeUrl}}"
+					],
+					"path": [
+						"scripts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Vendors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{homeUrl}}/vendors",
+					"host": [
+						"{{homeUrl}}"
+					],
+					"path": [
+						"vendors"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Dashboard",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{homeUrl}}/dashboard",
+					"host": [
+						"{{homeUrl}}"
+					],
+					"path": [
+						"dashboard"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
