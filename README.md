@@ -17,7 +17,9 @@ npm install
 Create a .env file in the root directory with the following keys:
 
 # API Endpoints
-FEROOT_API_BASE_URL= https://app.feroot.com/api/v1/platform
+FEROOT_API_BASE_URL= 
+How to find: 
+Go to Api Doc on tenant for reference
 
 # API Authentication
 FEROOT_API_KEY=
