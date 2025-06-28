@@ -1,15 +1,17 @@
-import axios from 'axios';
 import apiClient from '../utils/apiClient';
+import {
+  VendorParams,
+  VendorResponse,
+} from '../types/vendor.types';
 
-interface VendorParams {
-  startDate: number;
-  endDate: number;
-  projectUuids: string[];
-  dataSourceUuids: string[];
-  categories?: string[];
-}
+export const fetchAllVendors = async (
+  params: VendorParams
+): Promise<VendorResponse> => {
+  const response = await apiClient.get<VendorResponse>('/vendors', { params });
+  const { vendors, stats } = response.data;
 
-export const fetchAllVendors = async (params: VendorParams): Promise<any> => {
-  const response = await apiClient.get('/vendors', { params });
-  return response.data;
+  return {
+    vendors,
+    stats,
+  };
 };

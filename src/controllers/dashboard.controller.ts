@@ -4,7 +4,7 @@ import { extractFerootUuids } from '../utils/urlUuidExtractor';
 
 const getDashboard = async (req: Request, res: Response): Promise<void> => {
   try {
-    
+
     const endDate = Date.now();
     const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
     const sourceUrl = process.env.FEROOT_SOURCE_URL as string;
@@ -13,7 +13,7 @@ const getDashboard = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ error: "FEROOT_SOURCE_URL is not defined" });
       return;
     }
-    
+
     const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
     const dashboardData = await fetchDashboard({
       projectUuids: [projectUuid],

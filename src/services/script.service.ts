@@ -1,20 +1,15 @@
-import axios from 'axios';
+import { ScriptParams, ScriptResponse } from '../types/script.types';
 import apiClient from '../utils/apiClient';
 
-interface ScriptParams {
-  startDate: number;
-  endDate: number;
-  projectUuids: string[];
-  dataSourceUuids: string[];
-  limit?: number;
-  page?: number;
-  sortKey?: string;
-  sortDir?: 'asc' | 'desc';
-  categories?: string[];
-  search?: string;
-}
+export const fetchAllScripts = async (
+  params: ScriptParams
+): Promise<ScriptResponse> => {
+  const response = await apiClient.get<ScriptResponse>('/scripts', { params });
 
-export const fetchAllScripts = async (params: ScriptParams): Promise<any> => {
-  const response = await apiClient.get('/scripts', { params });
-  return response.data;
+  const { items, totalCount } = response.data;
+
+  return {
+    items: items,
+    totalCount,
+  };
 };

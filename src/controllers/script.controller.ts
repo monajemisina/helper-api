@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import { fetchAllScripts } from '../services/script.service';
 import { extractFerootUuids } from '../utils/urlUuidExtractor';
-import { getSegmentedPatterns } from '../utils/urlPatternUtils';
+import { ScriptQueryParams } from '../types/script.types';
 
-const getAllScripts = async (req: Request, res: Response): Promise<void> => {
+const getAllScripts = async (req: Request<{}, {}, {}, ScriptQueryParams>,
+  res: Response
+): Promise<void> => {
   try {
-    
+
     const endDate = Date.now();
     const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
     const sourceUrl = process.env.FEROOT_SOURCE_URL;
@@ -15,26 +17,48 @@ const getAllScripts = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
+    const { name, url } = req.query;
 
-    const data = await fetchAllScripts({
+
+    const { items: scripts, totalCount } = await fetchAllScripts({
       startDate,
       endDate,
       projectUuids: [projectUuid],
       dataSourceUuids: [dataSourceUuid],
-      limit: 1000,
-      page: 1,
+
     });
-    const scriptUrls = data.items.map((item: any) => item.scriptUrl).sort();
-    const totalCount = scriptUrls.length;
-    // const segmentedScripts = getSegmentedPatterns({
-    //   urls: scriptUrls,
-    //   totalCount
-    // }); not functional yet
-    
-    res.status(200).send({
-      scriptUrls,
-      totalCount,
-    });
+
+    if (name === 'all') {
+      const scriptNames = scripts.map((s) => s.scriptName);
+      res.status(200).json({
+        total: scriptNames.length,
+        scripts: scriptNames,
+      });
+    } else if (name) {
+      const filtered = scripts.filter((s) =>
+        s.scriptName.toLowerCase().includes(name.toLowerCase())
+      );
+      res.status(200).json({
+        total: filtered.length,
+        scripts: filtered,
+      });
+    } else if (url === 'all') {
+      const scriptUrls = scripts.map((s) => s.scriptUrl);
+      res.status(200).json({
+        total: scriptUrls.length,
+        scripts: scriptUrls,
+      });
+    } else if (url) {
+      const filtered = scripts.filter((s) =>
+        s.scriptUrl.toLowerCase().includes(url.toLowerCase())
+      );
+      res.status(200).json({
+        total: filtered.length,
+        scripts: filtered,
+      });
+    } else {
+      res.status(200).json({ totalCount, scripts });
+    }
 
   } catch (error: any) {
     console.error('Error fetching Feroot scripts:', {
