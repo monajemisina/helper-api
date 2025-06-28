@@ -20,9 +20,17 @@ const getDashboard = async (req: Request, res: Response): Promise<void> => {
       dataSourceUuids: [dataSourceUuid],
       startDate,
       endDate,
+      timezoneOffset: new Date().getTimezoneOffset(),
     });
 
-    res.status(200).send(dashboardData);
+    res.status(200).send({
+      scripts: dashboardData.scripts,
+      cookies: dashboardData.cookies,
+      dataAssets: dashboardData.dataAssets,
+      issues: dashboardData.issues,
+      screenshotUrl: dashboardData.screenshotUrl,
+    });
+
   } catch (error: any) {
     console.error("Error fetching Feroot dashboard:", {
       message: error.message,

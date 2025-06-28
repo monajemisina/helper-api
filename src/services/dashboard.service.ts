@@ -1,25 +1,9 @@
-import axios from 'axios';
+import apiClient from '../utils/apiClient';
+import { DashboardParams, DashboardResponse } from '../types/dashboard.types';
 
-interface DashboardParams {
-projectUuids: string[];
-  dataSourceUuids: string[];
-  startDate: number;
-  endDate: number;
-  categories?: string[];
-}
-
-export const fetchDashboard = async (params: DashboardParams): Promise<any> => {
-  const dashboardApi = process.env.FEROOT_API_DASH_URL as string;
-  if (!dashboardApi) {
-    throw new Error("FEROOT_API_DASH_URL is not defined in environment variables");
-  }
-  const response = await axios.get(dashboardApi, {
-    params,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-KEY': process.env.FEROOT_API_KEY || '',
-    },
-  });
-
+export const fetchDashboard = async (
+  params: DashboardParams
+): Promise<DashboardResponse> => {
+  const response = await apiClient.get<DashboardResponse>('/dashboard', { params });
   return response.data;
 };

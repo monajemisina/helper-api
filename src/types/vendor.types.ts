@@ -1,7 +1,6 @@
 export interface VendorItem {
   id: string;
   name: string;
-  logoUrl?: string;
   type?: string;
   category?: string;
   source?: string;
