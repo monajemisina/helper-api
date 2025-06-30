@@ -57,7 +57,6 @@ const updateAllowedVendors = async (
   allowedVendors: AllowedVendors
 ): Promise<Policy> => {
   const { data: currentPolicy } = await apiClient.get<Policy>(`/policies/${ruleId}`);
-
   const issueRules = currentPolicy.issueRules || {};
   const unauthorizedDataAccess = issueRules["unauthorized-data-access"] || { enabled: true, list: [] };
   const list = unauthorizedDataAccess.list || [];
