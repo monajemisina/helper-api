@@ -8,55 +8,171 @@
 	},
 	"item": [
 		{
-			"name": "Get All Scripts",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{homeUrl}}/scripts",
-					"host": [
-						"{{homeUrl}}"
-					],
-					"path": [
-						"scripts"
-					]
+			"name": "Scripts",
+			"item": [
+				{
+					"name": "Get All Scripts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{homeUrl}}/scripts",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"scripts"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "all",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Get All Vendors",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{homeUrl}}/vendors",
-					"host": [
-						"{{homeUrl}}"
-					],
-					"path": [
-						"vendors"
-					]
+			"name": "Vendors",
+			"item": [
+				{
+					"name": "Get All Vendors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{homeUrl}}/vendors?name=all",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"vendors"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "all"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Get Dashboard",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{homeUrl}}/dashboard",
-					"host": [
-						"{{homeUrl}}"
-					],
-					"path": [
-						"dashboard"
-					]
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Get Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{homeUrl}}/dashboard",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"dashboard"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "Policy",
+			"item": [
+				{
+					"name": "Bulk Update Scripts Policy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dataAssetType\": \"cc_number\",\n  \"allowedUrlSources\": {\n    \"inherit\": false,\n    \"list\": [\n      { \"urlPattern\": \"!*facebook.com*\" },\n      { \"urlPattern\": \"!*facebook.net*\" }\n    ],\n    \"scope\": {\n      \"presence\": true,\n      \"read\": false,\n      \"transfer\": true\n    }\n  }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{homeUrl}}/policies/{{ruleId}}/data-assets/allowed-scripts",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"policies",
+								"{{ruleId}}",
+								"data-assets",
+								"allowed-scripts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Update Vendors Policy",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"dataAssetType\": \"email\",\n  \"allowedVendors\": {\n    \"inherit\": false,\n    \"list\": [\n      { \"vendorId\": \"bing_ads\", \"entryMode\": \"allow\" } //allo or deny\n      \n    ],\n    \"scope\": {\n      \"presence\": true,\n      \"read\": true,\n      \"transfer\": false\n    }\n  }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{homeUrl}}/policies/{{ruleId}}/data-assets/allowed-vendors",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"policies",
+								"{{ruleId}}",
+								"data-assets",
+								"allowed-vendors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Policy By Asset Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{homeUrl}}/policies/allowed/{{ruleId}}?name=cc_number",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"policies",
+								"allowed",
+								"{{ruleId}}"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "cc_number"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	]
 }
