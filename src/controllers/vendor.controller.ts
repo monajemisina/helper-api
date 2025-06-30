@@ -23,14 +23,14 @@ const getAllVendors = async (req: Request, res: Response): Promise<any> => {
     });
 
     if (name === 'all') {
-      const vendorNames = vendors.map((ven: any) => ven.name);
+      const vendorNames = vendors.map((ven: any) => ven.id);
       res.status(200).json({
         total: vendorNames.length,
         vendors: vendorNames,
       });
     } else if (name) {
       const filtered = vendors.filter((ven: any) =>
-        ven.name.toLowerCase().includes((name as string).toLowerCase())
+        ven.id.toLowerCase().includes((name as string).toLowerCase())
       );
       res.status(200).json({
         total: filtered.length,

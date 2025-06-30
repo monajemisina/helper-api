@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { fetchAllScripts, fetchRulePolicy, updateAllowedUrlSources } from '../services/script.service';
+import { fetchAllScripts } from '../services/script.service';
 import { extractFerootUuids } from '../utils/urlUuidExtractor';
+import { fetchRulePolicy } from '../services/policy.service';
 
 const getAllScripts = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -68,50 +69,6 @@ const getAllScripts = async (req: Request, res: Response): Promise<any> => {
 
 };
 
-const getAllowedScripts = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { ruleId } = req.params;
-    const { name } = req.query;
-    const data = await fetchRulePolicy(ruleId);
-
-    const dataAssetTypes = data.issueRules["unauthorized-data-access"]?.list;
-    if (!dataAssetTypes) {
-      res.status(404).json({ error: 'No data asset found' });
-      return;
-    }
-
-    const filtered = name ? dataAssetTypes.filter((item: any) => item.dataAssetType.toLowerCase().includes((name as string).toLowerCase())) : data;
-
-    res.status(200).json({ name: data.name, filtered });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch script allowlist' });
-  }
-};
-
-const bulkUpdateAllowedUrls = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { ruleId, dataAssetType } = req.params;
-    const { allowedUrlSources } = req.body;
- 
-    if (!Array.isArray(allowedUrlSources)) {
-      res.status(400).json({ error: 'allowedUrlSources must be an array' });
-      return;
-    }
-    const updatedItems = await updateAllowedUrlSources(ruleId, dataAssetType, allowedUrlSources as any);
-    res.status(200).json({
-      message: 'Allowed URL sources updated successfully',
-      updatedCount: updatedItems.length,
-    });
-  } catch (error) {
-    console.error('Error updating allowed URL sources:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
 export default {
   getAllScripts,
-  getAllowedScripts,
-  bulkUpdateAllowedUrls
 }
-
-

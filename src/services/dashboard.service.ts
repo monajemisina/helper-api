@@ -8,4 +8,4 @@ const fetchDashboard = async (
   return response.data;
 };
 
-export {fetchDashboard}
+export { fetchDashboard }
