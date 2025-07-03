@@ -71,3 +71,16 @@ export interface Policy {
   associatedProjectsCount: number;
   status?: string;             
 }
+
+
+export interface UpdateAllowedUrlSourcesParams {
+  ruleId: string;
+  dataAssetType: string;
+  allowedUrlSources: AllowedUrlSources;
+}
+
+export interface UpdateAllowedVendorsParams {
+  ruleId: string;
+  dataAssetType: string;
+  allowedVendors: AllowedVendors;
+}

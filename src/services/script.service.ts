@@ -1,23 +1,56 @@
+import { FindScriptsParams, FindScriptsResult, ScriptItem } from '../types/script.types';
 import apiClient from '../utils/apiClient';
+import { extractFerootUuids } from '../utils/urlUuidExtractor';
 
-const fetchAllScripts = async (params: any): Promise<any> => {
-  const { page = 1, pageSize = 10, ...restParams } = params;
-  const response = await apiClient.get<any>('/scripts', {
-    params: {
-      ...restParams,
-      page,
-      limit: pageSize,
-    },
-  });
+const fetchAllScripts = async (opts: FindScriptsParams): Promise<FindScriptsResult> => {
+  const sourceUrl = process.env.FEROOT_SOURCE_URL;
+  if (!sourceUrl) {
+    throw { status: 400, message: 'FEROOT_SOURCE_URL is not defined' };
+  }
 
-  const { items, totalCount } = response.data;
+  const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
+  const params: Record<string, any> = {
+    projectUuids: [projectUuid],
+    startDate:    new Date('2025-03-31').getTime(),
+    endDate:      Date.now(),
+    page:         opts.page,
+    limit:        opts.pageSize,
+    ...(dataSourceUuid && { dataSourceUuids: [dataSourceUuid] }),
+  };
+  const { items, totalCount } = await apiClient
+    .get<{ items: ScriptItem[]; totalCount: number }>('/scripts', { params })
+    .then(r => r.data);
+
+  let scripts: ScriptItem[] | string[] = items;
+  let scriptCount: number | undefined;
+
+  if (opts.name === 'all') {
+    const names = Array.from(
+      new Set(items.map(s => s.scriptName).filter(Boolean))
+    );
+    scripts     = names;
+    scriptCount = names.length;
+  } else if (opts.name) {
+    scripts = items.filter(s =>
+      s.scriptName.toLowerCase().includes(opts.name!.toLowerCase())
+    );
+  } else if (opts.url === 'all') {
+    scripts = items.map(s => s.scriptUrl);
+  } else if (opts.url) {
+    scripts = items.filter(s =>
+      s.scriptUrl.toLowerCase().includes(opts.url!.toLowerCase())
+    );
+  }
+
   return {
-    items,
+    page: opts.page,
+    pageSize: opts.pageSize,
     totalCount,
-    page,
-    pageSize,
+    scripts,
+    scriptCount,
   };
 };
+
 
 
 export { fetchAllScripts };

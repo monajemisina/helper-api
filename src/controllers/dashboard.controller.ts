@@ -1,50 +1,38 @@
+// src/controllers/dashboard.controller.ts
 import { Request, Response } from 'express';
-import { fetchDashboard } from '../services/dashboard.service';
-import { extractFerootUuids } from '../utils/urlUuidExtractor';
+import * as dashboardService from '../services/dashboard.service';
 
-const getDashboard = async (req: Request, res: Response): Promise<void> => {
+const getDashboard = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const endDate        = Date.now();
+  const startDate      = new Date('2024-05-31').getTime();
+  const timezoneOffset = new Date().getTimezoneOffset();
+
   try {
-
-    const endDate = Date.now();
-    const startDate = new Date('2024-05-31').getTime();
-    const sourceUrl = process.env.FEROOT_SOURCE_URL as string;
-
-    if (!sourceUrl) {
-      res.status(400).json({ error: "FEROOT_SOURCE_URL is not defined" });
-      return;
-    }
-
-    const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
-    const dashboardData = await fetchDashboard({
-      projectUuids: [projectUuid],
-      dataSourceUuids: [dataSourceUuid],
+    const data = await dashboardService.fetchDashboard({
       startDate,
       endDate,
-      timezoneOffset: new Date().getTimezoneOffset(),
+      timezoneOffset,
     });
 
-    res.status(200).send({
-      scripts: dashboardData.scripts,
-      cookies: dashboardData.cookies,
-      dataAssets: dashboardData.dataAssets,
-      issues: dashboardData.issues,
-      screenshotUrl: dashboardData.screenshotUrl,
+    res.status(200).json({
+      scripts:       data.scripts,
+      cookies:       data.cookies,
+      dataAssets:    data.dataAssets,
+      issues:        data.issues,
+      screenshotUrl: data.screenshotUrl,
     });
-
-  } catch (error: any) {
-    console.error("Error fetching Feroot dashboard:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
-
-    res.status(error.response?.status || 500).send({
-      error: error.message,
-      details: error.response?.data || "Unexpected error - dashboard",
-    });
+  } catch (err: any) {
+    console.error('Error in getDashboard:', err);
+    res
+      .status(err.status || err.response?.status || 500)
+      .json({
+        error:   err.message || 'Unexpected error',
+        details: err.response?.data || null,
+      });
   }
 };
 
-export default {
-  getDashboard,
-};
+export default { getDashboard };

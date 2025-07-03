@@ -1,112 +1,114 @@
-import { Policy, AllowedUrlSources, AllowedVendors, DataAssetItem } from '../types/policy.types';
+// src/services/policy.service.ts
 import apiClient from '../utils/apiClient';
 import crypto from 'crypto';
+import {
+  Policy,
+  AllowedUrlSources,
+  AllowedVendors,
+  DataAssetItem,
+  UpdateAllowedUrlSourcesParams,
+  UpdateAllowedVendorsParams,
+} from '../types/policy.types';
+
+
+const fetchRulePolicy = async (ruleId: string): Promise<Policy> => {
+  if (!ruleId) {
+    throw { status: 400, message: 'ruleId is required' };
+  }
+  const resp = await apiClient.get<Policy>(`/policies/${ruleId}`);
+  return resp.data;
+};
 
 const updateAllowedUrlSources = async (
-  ruleId: string,
-  dataAssetType: string,
-  allowedUrlSources: AllowedUrlSources
+  params: UpdateAllowedUrlSourcesParams
 ): Promise<Policy> => {
-  const { data: currentPolicy } = await apiClient.get<Policy>(`/policies/${ruleId}`);
+  const { ruleId, dataAssetType, allowedUrlSources } = params;
+  const current = await fetchRulePolicy(ruleId);
 
-  const issueRules = currentPolicy.issueRules || {};
-  const unauthorizedDataAccess = issueRules["unauthorized-data-access"] || { enabled: true, list: [] };
-  const list = unauthorizedDataAccess.list || [];
+  const issueRules = current.issueRules || {};
+  const uda = issueRules['unauthorized-data-access'] || { enabled: true, list: [] };
+  const list = uda.list || [];
 
-  const index = list.findIndex((item) => item.dataAssetType === dataAssetType);
+  const idx = list.findIndex(item => item.dataAssetType === dataAssetType);
 
-  const updatedList =
-    index !== -1
-      ? list.map((item) =>
-        item.dataAssetType === dataAssetType
-          ? { ...item, allowedUrlSources }
-          : item
-      )
-      : [
-        ...list,
-        {
-          id: crypto.randomUUID(),
-          dataAssetType,
-          allowedUrlSources,
-          allowedVendors: {
-            inherit: true,
-            list: [],
-            scope: { presence: false, read: false, transfer: false },
-          },
-        } as DataAssetItem,
-      ];
+  const newItem: DataAssetItem = idx === -1
+    ? {
+        id: crypto.randomUUID(),
+        dataAssetType,
+        allowedUrlSources,
+        allowedVendors: {
+          inherit: true,
+          list: [],
+          scope: { presence: false, read: false, transfer: false },
+        },
+      }
+    : { ...list[idx], allowedUrlSources };
+
+  const updatedList = idx === -1
+    ? [...list, newItem]
+    : list.map((it, i) => (i === idx ? newItem : it));
 
   const payload: Policy = {
-    ...currentPolicy,
+    ...current,
     issueRules: {
       ...issueRules,
-      "unauthorized-data-access": {
-        ...unauthorizedDataAccess,
+      'unauthorized-data-access': {
+        ...uda,
         list: updatedList,
       },
     },
   };
 
-  const response = await apiClient.put<Policy>(`/policies/${ruleId}`, payload);
-  return response.data;
+  const resp = await apiClient.put<Policy>(`/policies/${ruleId}`, payload);
+  return resp.data;
 };
 
 const updateAllowedVendors = async (
-  ruleId: string,
-  dataAssetType: string,
-  allowedVendors: AllowedVendors
+  params: UpdateAllowedVendorsParams
 ): Promise<Policy> => {
-  const { data: currentPolicy } = await apiClient.get<Policy>(`/policies/${ruleId}`);
-  const issueRules = currentPolicy.issueRules || {};
-  const unauthorizedDataAccess = issueRules["unauthorized-data-access"] || { enabled: true, list: [] };
-  const list = unauthorizedDataAccess.list || [];
+  const { ruleId, dataAssetType, allowedVendors } = params;
+  const current = await fetchRulePolicy(ruleId);
 
-  const index = list.findIndex((item) => item.dataAssetType === dataAssetType);
+  const issueRules = current.issueRules || {};
+  const uda = issueRules['unauthorized-data-access'] || { enabled: true, list: [] };
+  const list = uda.list || [];
 
-  const updatedList =
-    index !== -1
-      ? list.map((item) =>
-        item.dataAssetType === dataAssetType
-          ? { ...item, allowedVendors }
-          : item
-      )
-      : [
-        ...list,
-        {
-          id: crypto.randomUUID(),
-          dataAssetType,
-          allowedVendors,
-          allowedUrlSources: {
-            inherit: true,
-            list: [],
-            scope: { presence: false, read: false, transfer: false },
-          },
-        } as DataAssetItem,
-      ];
+  const idx = list.findIndex(item => item.dataAssetType === dataAssetType);
+
+  const newItem: DataAssetItem = idx === -1
+    ? {
+        id: crypto.randomUUID(),
+        dataAssetType,
+        allowedUrlSources: {
+          inherit: true,
+          list: [],
+          scope: { presence: false, read: false, transfer: false },
+        },
+        allowedVendors,
+      }
+    : { ...list[idx], allowedVendors };
+
+  const updatedList = idx === -1
+    ? [...list, newItem]
+    : list.map((it, i) => (i === idx ? newItem : it));
 
   const payload: Policy = {
-    ...currentPolicy,
+    ...current,
     issueRules: {
       ...issueRules,
-      "unauthorized-data-access": {
-        ...unauthorizedDataAccess,
+      'unauthorized-data-access': {
+        ...uda,
         list: updatedList,
       },
     },
   };
 
-  const response = await apiClient.put<Policy>(`/policies/${ruleId}`, payload);
-  return response.data;
+  const resp = await apiClient.put<Policy>(`/policies/${ruleId}`, payload);
+  return resp.data;
 };
 
-const fetchRulePolicy = async (ruleId: string): Promise<Policy> => {
-  const response = await apiClient.get<Policy>(`/policies/${ruleId}`);
-  return response.data;
-};
-
-
-export {
+export  {
+  fetchRulePolicy,
   updateAllowedUrlSources,
   updateAllowedVendors,
-  fetchRulePolicy
-}
+};

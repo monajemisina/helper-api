@@ -1,62 +1,20 @@
+// src/controllers/vendor.controller.ts
 import { Request, Response } from 'express';
-import { fetchAllVendors } from '../services/vendor.service';
-import { extractFerootUuids } from '../utils/urlUuidExtractor';
+import * as vendorService from '../services/vendor.service';
 
-const getAllVendors = async (req: Request, res: Response): Promise<any> => {
+export const getAllVendors = async (req: Request, res: Response) => {
+  const name = req.query.name as string | undefined;
+  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.pageSize) || 10;
+
   try {
-    const endDate = Date.now();
-    const startDate = new Date('2025-05-31').getTime();
-
-    const sourceUrl = process.env.FEROOT_SOURCE_URL;
-    if (!sourceUrl) {
-      res.status(400).json({ error: "FEROOT_SOURCE_URL is not defined" });
-      return;
-    }
-
-    const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
-    const { name } = req.query;
-    
-    const { vendors, stats, totalCount } = await fetchAllVendors({
-      startDate,
-      endDate,
-      projectUuids: [projectUuid],
-      dataSourceUuids: [dataSourceUuid],
-   
-    });
-
-    if (name === 'all') {
-      const vendorNames = vendors.map((ven: any) => ven.id);
-      res.status(200).json({
-        total: vendorNames.length,
-        vendors: vendorNames,
-      });
-    } else if (name) {
-      const filtered = vendors.filter((ven: any) =>
-        ven.id.toLowerCase().includes((name as string).toLowerCase())
-      );
-      res.status(200).json({
-        total: filtered.length,
-        vendors: filtered,
-        totalCount,
-      });
-    } else {
-      res.status(200).json({
-        stats,
-        vendors,
-        totalCount,
-      });
-    }
-  } catch (error: any) {
-    console.error("Error fetching Feroot vendors:", {
-      message: error.message,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
-
-    res.status(error.response?.status || 500).json({
-      error: error.message,
-      details: error.response?.data || "Unexpected error - vendors",
-    });
+    const result = await vendorService.fetchAllVendors({ name, page, pageSize });
+    res.status(200).json(result);
+  } catch (err: any) {
+    console.error('Error in getAllVendors:', err);
+    res
+      .status(err.status || 500)
+      .json({ error: err.message, details: err.details });
   }
 };
 
