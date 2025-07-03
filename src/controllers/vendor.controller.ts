@@ -5,7 +5,7 @@ import { extractFerootUuids } from '../utils/urlUuidExtractor';
 const getAllVendors = async (req: Request, res: Response): Promise<any> => {
   try {
     const endDate = Date.now();
-    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
+    const startDate = new Date('2025-05-31').getTime();
 
     const sourceUrl = process.env.FEROOT_SOURCE_URL;
     if (!sourceUrl) {
@@ -15,11 +15,13 @@ const getAllVendors = async (req: Request, res: Response): Promise<any> => {
 
     const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
     const { name } = req.query;
-    const { vendors, stats } = await fetchAllVendors({
+    
+    const { vendors, stats, totalCount } = await fetchAllVendors({
       startDate,
       endDate,
       projectUuids: [projectUuid],
       dataSourceUuids: [dataSourceUuid],
+   
     });
 
     if (name === 'all') {
@@ -35,11 +37,15 @@ const getAllVendors = async (req: Request, res: Response): Promise<any> => {
       res.status(200).json({
         total: filtered.length,
         vendors: filtered,
+        totalCount,
       });
     } else {
-      res.status(200).json({ stats, vendors });
+      res.status(200).json({
+        stats,
+        vendors,
+        totalCount,
+      });
     }
-
   } catch (error: any) {
     console.error("Error fetching Feroot vendors:", {
       message: error.message,

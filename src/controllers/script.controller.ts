@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import { fetchAllScripts } from '../services/script.service';
 import { extractFerootUuids } from '../utils/urlUuidExtractor';
-import { fetchRulePolicy } from '../services/policy.service';
 
 const getAllScripts = async (req: Request, res: Response): Promise<any> => {
   try {
     const endDate = Date.now();
-    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
+    const startDate = new Date('2025-05-31').getTime();
     const sourceUrl = process.env.FEROOT_SOURCE_URL;
     if (!sourceUrl) {
       res.status(400).json({ error: "FEROOT_SOURCE_URL is not defined" });
@@ -15,18 +14,25 @@ const getAllScripts = async (req: Request, res: Response): Promise<any> => {
 
     const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
     const { name, url } = req.query;
+    const page = parseInt(req.query.page as string) || 1;
+    const pageSize = parseInt(req.query.pageSize as string) || 10;
+
     const { items: scripts, totalCount } = await fetchAllScripts({
       startDate,
       endDate,
       projectUuids: [projectUuid],
       dataSourceUuids: [dataSourceUuid],
+      page,
+      pageSize,
     });
-
     if (name === 'all') {
       const scriptNames = scripts.map((sc: any) => sc.scriptName);
       res.status(200).json({
         total: scriptNames.length,
         scripts: scriptNames,
+        page,
+        pageSize,
+        totalCount,
       });
     } else if (name) {
       const filtered = scripts.filter((sc: any) =>
@@ -35,12 +41,18 @@ const getAllScripts = async (req: Request, res: Response): Promise<any> => {
       res.status(200).json({
         total: filtered.length,
         scripts: filtered,
+        page,
+        pageSize,
+        totalCount,
       });
     } else if (url === 'all') {
       const scriptUrls = scripts.map((sc: any) => sc.scriptUrl);
       res.status(200).json({
         total: scriptUrls.length,
         scripts: scriptUrls,
+        page,
+        pageSize,
+        totalCount,
       });
     } else if (url) {
       const filtered = scripts.filter((sc: any) =>
@@ -49,9 +61,12 @@ const getAllScripts = async (req: Request, res: Response): Promise<any> => {
       res.status(200).json({
         total: filtered.length,
         scripts: filtered,
+        page,
+        pageSize,
+        totalCount,
       });
     } else {
-      res.status(200).json({ totalCount, scripts });
+      res.status(200).json({ totalCount, scripts, page, pageSize });
     }
 
   } catch (error: any) {

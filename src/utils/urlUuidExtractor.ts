@@ -1,12 +1,15 @@
-export const extractFerootUuids = (url: string): { projectUuid: string; dataSourceUuid: string } => {
+export const extractFerootUuids = (
+  url: string
+): { projectUuid: string; dataSourceUuid?: string } => {
   try {
     const parsedUrl = new URL(url);
     const path = parsedUrl.hash || "";
-    const regex = /#\/projects\/([a-f0-9-]+)\/data-sources\/crawl\/([a-f0-9-]+)/i;
+
+    const regex = /#\/projects\/([a-f0-9-]+)\/data-sources(?:\/crawl\/([a-f0-9-]+))?/i;
     const match = path.match(regex);
 
     if (!match) {
-      throw new Error("URL does not contain valid projectUuid and dataSourceUuid");
+      throw new Error("URL does not contain valid projectUuid or data source format.");
     }
 
     const [, projectUuid, dataSourceUuid] = match;
