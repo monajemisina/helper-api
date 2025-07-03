@@ -5,7 +5,7 @@ import { extractFerootUuids } from '../utils/urlUuidExtractor';
 const getAllScripts = async (req: Request, res: Response): Promise<any> => {
   try {
     const endDate = Date.now();
-    const startDate = new Date('2025-05-31').getTime();
+    const startDate = new Date('2025-03-31').getTime();
     const sourceUrl = process.env.FEROOT_SOURCE_URL;
     if (!sourceUrl) {
       res.status(400).json({ error: "FEROOT_SOURCE_URL is not defined" });
@@ -26,33 +26,33 @@ const getAllScripts = async (req: Request, res: Response): Promise<any> => {
       pageSize,
     });
     if (name === 'all') {
-      const scriptNames = scripts.map((sc: any) => sc.scriptName);
+     const scriptNames = [...new Set(scripts.map((sc: any) => sc.scriptName).filter((name: string | undefined) => name))]
       res.status(200).json({
-        total: scriptNames.length,
-        scripts: scriptNames,
         page,
         pageSize,
         totalCount,
+        scriptCount: scriptNames.length,
+        scripts: scriptNames,
       });
     } else if (name) {
       const filtered = scripts.filter((sc: any) =>
         sc.scriptName.toLowerCase().includes((name as string).toLowerCase())
       );
       res.status(200).json({
-        total: filtered.length,
-        scripts: filtered,
         page,
         pageSize,
         totalCount,
+        scripts: filtered,
+     
       });
     } else if (url === 'all') {
       const scriptUrls = scripts.map((sc: any) => sc.scriptUrl);
       res.status(200).json({
-        total: scriptUrls.length,
-        scripts: scriptUrls,
         page,
         pageSize,
         totalCount,
+        scripts: scriptUrls,
+     
       });
     } else if (url) {
       const filtered = scripts.filter((sc: any) =>
@@ -66,7 +66,7 @@ const getAllScripts = async (req: Request, res: Response): Promise<any> => {
         totalCount,
       });
     } else {
-      res.status(200).json({ totalCount, scripts, page, pageSize });
+      res.status(200).json({ totalCount, page, pageSize, scripts});
     }
 
   } catch (error: any) {

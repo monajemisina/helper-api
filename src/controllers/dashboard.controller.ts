@@ -6,7 +6,7 @@ const getDashboard = async (req: Request, res: Response): Promise<void> => {
   try {
 
     const endDate = Date.now();
-    const startDate = endDate - 30 * 24 * 60 * 60 * 1000; // 30 days
+    const startDate = new Date('2024-05-31').getTime();
     const sourceUrl = process.env.FEROOT_SOURCE_URL as string;
 
     if (!sourceUrl) {
