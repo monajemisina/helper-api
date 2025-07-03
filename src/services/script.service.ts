@@ -11,10 +11,10 @@ const fetchAllScripts = async (opts: FindScriptsParams): Promise<FindScriptsResu
   const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
   const params: Record<string, any> = {
     projectUuids: [projectUuid],
-    startDate:    new Date('2025-03-31').getTime(),
-    endDate:      Date.now(),
-    page:         opts.page,
-    limit:        opts.pageSize,
+    startDate: new Date('2025-03-31').getTime(),
+    endDate: Date.now(),
+    page: opts.page,
+    limit: opts.pageSize,
     ...(dataSourceUuid && { dataSourceUuids: [dataSourceUuid] }),
   };
   const { items, totalCount } = await apiClient
@@ -28,7 +28,7 @@ const fetchAllScripts = async (opts: FindScriptsParams): Promise<FindScriptsResu
     const names = Array.from(
       new Set(items.map(s => s.scriptName).filter(Boolean))
     );
-    scripts     = names;
+    scripts = names;
     scriptCount = names.length;
   } else if (opts.name) {
     scripts = items.filter(s =>

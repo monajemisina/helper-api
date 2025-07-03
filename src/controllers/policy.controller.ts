@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { UpdateAllowedUrlSourcesParams, UpdateAllowedVendorsParams } from '../types/policy.types';
 import * as policyService from '../services/policy.service';
 
+
 const bulkUpdateAllowedUrls = async (req: Request, res: Response) => {
   const { ruleId } = req.params;
   const { dataAssetType, allowedUrlSources } = req.body;
@@ -13,7 +14,7 @@ const bulkUpdateAllowedUrls = async (req: Request, res: Response) => {
     !Array.isArray(allowedUrlSources.list) ||
     !allowedUrlSources.list.every((i: any) => typeof i.urlPattern === 'string') ||
     typeof allowedUrlSources.scope?.presence !== 'boolean' ||
-    typeof allowedUrlSources.scope?.read     !== 'boolean' ||
+    typeof allowedUrlSources.scope?.read !== 'boolean' ||
     typeof allowedUrlSources.scope?.transfer !== 'boolean'
   ) {
     res.status(400).json({ error: 'Invalid or missing fields.' });
@@ -49,7 +50,7 @@ const bulkUpdateAllowedVendors = async (req: Request, res: Response) => {
     typeof allowedVendors.inherit !== 'boolean' ||
     !Array.isArray(allowedVendors.list) ||
     typeof allowedVendors.scope?.presence !== 'boolean' ||
-    typeof allowedVendors.scope?.read     !== 'boolean' ||
+    typeof allowedVendors.scope?.read !== 'boolean' ||
     typeof allowedVendors.scope?.transfer !== 'boolean'
   ) {
     res.status(400).json({ error: 'Invalid or missing fields.' });
@@ -76,30 +77,54 @@ const bulkUpdateAllowedVendors = async (req: Request, res: Response) => {
 };
 
 const getRulePolicy = async (req: Request, res: Response) => {
-  const { ruleId } = req.params;
-  const nameFilter = (req.query.name as string | undefined)?.toLowerCase();
-
   try {
+    const { ruleId } = req.params;
     const policy = await policyService.fetchRulePolicy(ruleId);
-    const items = policy.issueRules?.['unauthorized-data-access']?.list || [];
+    const dataAccess = policy?.issueRules?.['unauthorized-data-access']?.list || [];
+    const cookies = policy?.issueRules?.['unauthorized-cookies']?.list || [];
+    const scripts = policy?.issueRules?.['unauthorized-scripts']?.list || [];
+    const vendors = policy?.issueRules?.['unauthorized-vendors']?.list || [];
+    const { dataAssetType, issueRule } = req.query as {
+      dataAssetType?: string;
+      issueRule?: string;
+    };
 
-    if (nameFilter === 'all') {
-      const types = items.map(i => i.dataAssetType);
-      res.status(200).json({ total: types.length, dataAssetTypes: types });
-      return;
-    }
-
-    if (nameFilter) {
-      const filtered = items.filter(i =>
-        i.dataAssetType.toLowerCase().includes(nameFilter)
-      );
-      res
+    if (dataAssetType === 'all') {
+      const types = dataAccess.map(i => i.dataAssetType);
+      return res
         .status(200)
-        .json({ total: filtered.length, dataAssetTypes: filtered });
-      return;
+        .json({ total: types.length, dataAssetTypes: types });
+    } else if (dataAssetType) {
+      const filtered = dataAccess.filter(
+        item => item.dataAssetType.toLowerCase() === dataAssetType
+      );
+      const types = filtered.map(item => item);
+      return res.status(200).send({ dataAccessType: types })
     }
 
-    res.status(200).json({ total: items.length, data: policy });
+    switch (issueRule) {
+      case 'cookie': {
+        const unauthorizedCookies = cookies.map(c => c.namePattern);
+        return res
+          .status(200)
+          .json({ total: unauthorizedCookies.length, unauthorizedCookies });
+      }
+      case 'script': {
+        const unauthorizedScripts = scripts.map(s => s.namePattern);
+        return res
+          .status(200)
+          .json({ total: unauthorizedScripts.length, unauthorizedScripts });
+      }
+      case 'vendor': {
+        const unauthorizedVendors = vendors.map(v => v.vendorId);
+        return res
+          .status(200)
+          .json({ total: unauthorizedVendors.length, unauthorizedVendors });
+      }
+      default:
+        return res.status(200).json(policy);
+    }
+
   } catch (err: any) {
     console.error('getRulePolicy error:', err);
     res
@@ -108,8 +133,38 @@ const getRulePolicy = async (req: Request, res: Response) => {
   }
 };
 
+const deleteUnauthorizedScript = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { ruleId } = req.params;
+  const pattern = (req.query.urlPattern as string | undefined)?.trim();
+
+  if (!pattern) {
+    res.status(400).json({ error: 'urlPattern query param is required' });
+    return;
+  }
+
+  try {
+    const updated = await policyService.removeUnauthorizedScripts(
+      ruleId,
+      pattern
+    );
+    res.status(200).json({
+      message: `Removed "${pattern}" from unauthorized-scripts`,
+      policy: updated,
+    });
+  } catch (err: any) {
+    console.error('deleteUnauthorizedScript error:', err);
+    res
+      .status(err.status || 500)
+      .json({ error: err.message || 'Failed to delete script pattern' });
+  }
+};
+
 export default {
   bulkUpdateAllowedUrls,
   bulkUpdateAllowedVendors,
   getRulePolicy,
+  deleteUnauthorizedScript
 };

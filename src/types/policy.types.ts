@@ -1,7 +1,10 @@
 // --- Allowed URL Patterns ---
 
 export interface UrlPattern {
-  urlPattern: string;
+  urlPattern?: string;
+  namePattern?: string;
+  vendorId?: string;
+  entryMode?: string;
 }
 
 export interface UrlScope {
@@ -39,10 +42,10 @@ export interface AllowedVendors {
 // --- Per Data Asset Configuration ---
 
 export interface DataAssetItem {
-  id: string; 
-  dataAssetType: string; 
-  allowedUrlSources: AllowedUrlSources; 
-  allowedVendors: AllowedVendors;      
+  id: string;
+  dataAssetType: string;
+  allowedUrlSources: AllowedUrlSources;
+  allowedVendors: AllowedVendors;
 }
 
 // --- Unauthorized Data Access Rule ---
@@ -52,11 +55,30 @@ export interface UnauthorizedDataAccessRule {
   list: DataAssetItem[];
 }
 
-// --- Issue Rules Container ---
+// --- Unauthorized Scripts Rule ---
 
+export interface UnauthorizedScriptsRule {
+  enabled: boolean;
+  inherit: boolean;
+  list: UrlPattern[];
+}
+export interface UnauthorizedVendorsRule {
+  enabled: boolean;
+  inherit: boolean;
+  list: UrlPattern[];
+}
+
+export interface UnauthorizedCookiesRule {
+  enabled: boolean;
+  list: UrlPattern[];
+}
+
+// --- Issue Rules Container ---
 export interface IssueRules {
   "unauthorized-data-access": UnauthorizedDataAccessRule;
-
+  "unauthorized-scripts": UnauthorizedScriptsRule;
+  "unauthorized-cookies": UnauthorizedCookiesRule;
+  "unauthorized-vendors": UnauthorizedVendorsRule
 }
 
 // --- Top-Level Policy Structure ---
@@ -65,11 +87,11 @@ export interface Policy {
   uuid: string;
   name: string;
   issueRules: IssueRules;
-  allowedVendors?: AllowedVendor[]; 
-  allowedUrlSources?: UrlPattern[];  
-  serviceUuid?: string;           
+  allowedVendors?: AllowedVendor[];
+  allowedUrlSources?: UrlPattern[];
+  serviceUuid?: string;
   associatedProjectsCount: number;
-  status?: string;             
+  status?: string;
 }
 
 

@@ -10,10 +10,10 @@ const fetchDashboard = async (opts: DashboardParams): Promise<DashboardData> => 
 
   const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
   const params: Record<string, any> = {
-    projectUuids:    [projectUuid],
-    startDate:       opts.startDate,
-    endDate:         opts.endDate,
-    timezoneOffset:  opts.timezoneOffset,
+    projectUuids: [projectUuid],
+    startDate: opts.startDate,
+    endDate: opts.endDate,
+    timezoneOffset: opts.timezoneOffset,
     ...(dataSourceUuid && { dataSourceUuids: [dataSourceUuid] }),
   };
 

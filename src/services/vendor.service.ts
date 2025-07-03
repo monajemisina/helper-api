@@ -11,10 +11,10 @@ const fetchAllVendors = async (opts: FindVendorsParams): Promise<FindVendorsResu
   const { projectUuid, dataSourceUuid } = extractFerootUuids(sourceUrl);
   const params: Record<string, any> = {
     projectUuids: [projectUuid],
-    startDate:    new Date('2025-05-31').getTime(),
-    endDate:      Date.now(),
-    page:         opts.page,
-    limit:        opts.pageSize,
+    startDate: new Date('2025-05-31').getTime(),
+    endDate: Date.now(),
+    page: opts.page,
+    limit: opts.pageSize,
     ...(dataSourceUuid && { dataSourceUuids: [dataSourceUuid] }),
   };
   const { vendors, stats, totalCount } = await apiClient
@@ -27,10 +27,10 @@ const fetchAllVendors = async (opts: FindVendorsParams): Promise<FindVendorsResu
   if (opts.name === 'all') {
     const ids = vendors.map(v => v.id);
     return {
-      page:       opts.page,
-      pageSize:   opts.pageSize,
+      page: opts.page,
+      pageSize: opts.pageSize,
       totalCount,
-      vendors:    ids,
+      vendors: ids,
       vendorCount: ids.length,
     };
   } if (opts.name) {
@@ -38,18 +38,18 @@ const fetchAllVendors = async (opts: FindVendorsParams): Promise<FindVendorsResu
       v.id.toLowerCase().includes(opts.name!.toLowerCase())
     );
     return {
-      page:       opts.page,
-      pageSize:   opts.pageSize,
+      page: opts.page,
+      pageSize: opts.pageSize,
       totalCount,
-      vendors:    filtered,
+      vendors: filtered,
       stats,
       vendorCount: filtered.length,
     };
   }
 
   return {
-    page:       opts.page,
-    pageSize:   opts.pageSize,
+    page: opts.page,
+    pageSize: opts.pageSize,
     totalCount,
     vendors,
     stats,
