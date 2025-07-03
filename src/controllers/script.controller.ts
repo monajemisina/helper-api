@@ -1,4 +1,3 @@
-// src/controllers/script.controller.ts
 import { Request, Response } from 'express';
 import * as scriptService from '../services/script.service';
 

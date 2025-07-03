@@ -1,4 +1,3 @@
-// src/controllers/policy.controller.ts
 import { Request, Response } from 'express';
 import { UpdateAllowedUrlSourcesParams, UpdateAllowedVendorsParams } from '../types/policy.types';
 import * as policyService from '../services/policy.service';

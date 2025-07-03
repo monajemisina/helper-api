@@ -1,4 +1,3 @@
-// src/controllers/vendor.controller.ts
 import { Request, Response } from 'express';
 import * as vendorService from '../services/vendor.service';
 
