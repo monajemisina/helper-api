@@ -96,13 +96,13 @@ export interface Policy {
 
 
 export interface UpdateAllowedUrlSourcesParams {
-  ruleId: string;
+  policyId: string;
   dataAssetType: string;
   allowedUrlSources: AllowedUrlSources;
 }
 
 export interface UpdateAllowedVendorsParams {
-  ruleId: string;
+  policyId: string;
   dataAssetType: string;
   allowedVendors: AllowedVendors;
 }

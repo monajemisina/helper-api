@@ -104,13 +104,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{homeUrl}}/policies/{{ruleId}}/data-assets/allowed-scripts",
+							"raw": "{{homeUrl}}/policies/{{policyId}}/data-assets/allowed-scripts",
 							"host": [
 								"{{homeUrl}}"
 							],
 							"path": [
 								"policies",
-								"{{ruleId}}",
+								"{{policyId}}",
 								"data-assets",
 								"allowed-scripts"
 							]
@@ -133,13 +133,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{homeUrl}}/policies/{{ruleId}}/data-assets/allowed-vendors",
+							"raw": "{{homeUrl}}/policies/{{policyId}}/data-assets/allowed-vendors",
 							"host": [
 								"{{homeUrl}}"
 							],
 							"path": [
 								"policies",
-								"{{ruleId}}",
+								"{{policyId}}",
 								"data-assets",
 								"allowed-vendors"
 							]
@@ -153,14 +153,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{homeUrl}}/policies/allowed/{{ruleId}}?name=cc_number",
+							"raw": "{{homeUrl}}/policies/allowed/{{policyId}}?name=cc_number",
 							"host": [
 								"{{homeUrl}}"
 							],
 							"path": [
 								"policies",
 								"allowed",
-								"{{ruleId}}"
+								"{{policyId}}"
 							],
 							"query": [
 								{

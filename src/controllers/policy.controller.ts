@@ -4,7 +4,7 @@ import * as policyService from '../services/policy.service';
 
 
 const bulkUpdateAllowedUrls = async (req: Request, res: Response) => {
-  const { ruleId } = req.params;
+  const { policyId } = req.params;
   const { dataAssetType, allowedUrlSources } = req.body;
 
   if (
@@ -22,7 +22,7 @@ const bulkUpdateAllowedUrls = async (req: Request, res: Response) => {
 
   try {
     const params: UpdateAllowedUrlSourcesParams = {
-      ruleId,
+      policyId,
       dataAssetType,
       allowedUrlSources,
     };
@@ -40,7 +40,7 @@ const bulkUpdateAllowedUrls = async (req: Request, res: Response) => {
 };
 
 const bulkUpdateAllowedVendors = async (req: Request, res: Response) => {
-  const { ruleId } = req.params;
+  const { policyId } = req.params;
   const { dataAssetType, allowedVendors } = req.body;
 
   if (
@@ -58,7 +58,7 @@ const bulkUpdateAllowedVendors = async (req: Request, res: Response) => {
 
   try {
     const params: UpdateAllowedVendorsParams = {
-      ruleId,
+      policyId,
       dataAssetType,
       allowedVendors,
     };
@@ -77,8 +77,8 @@ const bulkUpdateAllowedVendors = async (req: Request, res: Response) => {
 
 const getRulePolicy = async (req: Request, res: Response) => {
   try {
-    const { ruleId } = req.params;
-    const policy = await policyService.fetchRulePolicy(ruleId);
+    const { policyId } = req.params;
+    const policy = await policyService.fetchRulePolicy(policyId);
     const dataAccess = policy?.issueRules?.['unauthorized-data-access']?.list || [];
     const cookies = policy?.issueRules?.['unauthorized-cookies']?.list || [];
     const scripts = policy?.issueRules?.['unauthorized-scripts']?.list || [];
@@ -109,7 +109,7 @@ const getRulePolicy = async (req: Request, res: Response) => {
           .json({ total: unauthorizedCookies.length, unauthorizedCookies });
       }
       case 'script': {
-        const unauthorizedScripts = scripts.map(s => s.namePattern);
+        const unauthorizedScripts = scripts.map(s => s.urlPattern);
         return res
           .status(200)
           .json({ total: unauthorizedScripts.length, unauthorizedScripts });
@@ -136,17 +136,17 @@ const deleteUnauthorizedScript = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { ruleId } = req.params;
-  const pattern = (req.query.urlPattern as string | undefined)?.trim();
+  const { policyId } = req.params;
+  const pattern = (req.body.urlPattern as string | undefined)?.trim();
 
   if (!pattern) {
-    res.status(400).json({ error: 'urlPattern query param is required' });
+    res.status(400).json({ error: 'urlPattern is required in request body' });
     return;
   }
 
   try {
     const updated = await policyService.removeUnauthorizedScripts(
-      ruleId,
+      policyId,
       pattern
     );
     res.status(200).json({

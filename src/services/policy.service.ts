@@ -8,19 +8,19 @@ import {
 } from '../types/policy.types';
 
 
-const fetchRulePolicy = async (ruleId: string): Promise<Policy> => {
-  if (!ruleId) {
-    throw { status: 400, message: 'ruleId is required' };
+const fetchRulePolicy = async (policyId: string): Promise<Policy> => {
+  if (!policyId) {
+    throw { status: 400, message: 'policyId is required' };
   }
-  const resp = await apiClient.get<Policy>(`/policies/${ruleId}`);
+  const resp = await apiClient.get<Policy>(`/policies/${policyId}`);
   return resp.data;
 };
 
 const updateAllowedUrlSources = async (
   params: UpdateAllowedUrlSourcesParams
 ): Promise<Policy> => {
-  const { ruleId, dataAssetType, allowedUrlSources } = params;
-  const current = await fetchRulePolicy(ruleId);
+  const { policyId, dataAssetType, allowedUrlSources } = params;
+  const current = await fetchRulePolicy(policyId);
 
   const issueRules = current.issueRules || {};
   const uda = issueRules['unauthorized-data-access'] || { enabled: true, list: [] };
@@ -56,15 +56,15 @@ const updateAllowedUrlSources = async (
     },
   };
 
-  const resp = await apiClient.put<Policy>(`/policies/${ruleId}`, payload);
+  const resp = await apiClient.put<Policy>(`/policies/${policyId}`, payload);
   return resp.data;
 };
 
 const updateAllowedVendors = async (
   params: UpdateAllowedVendorsParams
 ): Promise<Policy> => {
-  const { ruleId, dataAssetType, allowedVendors } = params;
-  const current = await fetchRulePolicy(ruleId);
+  const { policyId, dataAssetType, allowedVendors } = params;
+  const current = await fetchRulePolicy(policyId);
 
   const issueRules = current.issueRules || {};
   const uda = issueRules['unauthorized-data-access'] || { enabled: true, list: [] };
@@ -100,40 +100,46 @@ const updateAllowedVendors = async (
     },
   };
 
-  const resp = await apiClient.put<Policy>(`/policies/${ruleId}`, payload);
+  const resp = await apiClient.put<Policy>(`/policies/${policyId}`, payload);
   return resp.data;
 };
 
 const removeUnauthorizedScripts = async (
-  ruleId: string,
+  policyId: string,
   urlPatternToRemove: string
 ): Promise<Policy> => {
-  const { data: current } = await apiClient.get<Policy>(`/policies/${ruleId}`);
+  const { data: current } = await apiClient.get<Policy>(`/policies/${policyId}`);
   const issueRules = current.issueRules || {};
 
-  const us = issueRules['unauthorized-scripts'] || {
+  const unauthorizedScriptsRule = issueRules['unauthorized-scripts'] || {
     enabled: true,
     inherit: true,
     list: [] as DataAssetItem[],
   };
-  const filteredList = us.list.filter(
+
+  const exists = unauthorizedScriptsRule.list.some(item => item.urlPattern === urlPatternToRemove);
+
+
+  if (!exists) {
+    throw new Error(`No unauthorized script with pattern "${urlPatternToRemove}" found.`);
+  }
+
+  const filteredList = unauthorizedScriptsRule.list.filter(
     item => item.urlPattern !== urlPatternToRemove
   );
-
-  // 4. build updated payload
   const payload: Policy = {
     ...current,
     issueRules: {
       ...issueRules,
       'unauthorized-scripts': {
-        ...us,
+        ...unauthorizedScriptsRule,
         list: filteredList,
       },
     },
   };
 
   const { data: updated } = await apiClient.put<Policy>(
-    `/policies/${ruleId}`,
+    `/policies/${policyId}`,
     payload
   );
   return updated;
