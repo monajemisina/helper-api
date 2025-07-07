@@ -176,7 +176,7 @@ const deleteUnauthorizedScript = async (
   }
 };
 
-const removeUnauthorizedScriptsByKeywordController = async (
+const deleteUnauthorizedScriptsByKeyword = async (
   req: Request,
   res: Response
 ) => {
@@ -211,5 +211,5 @@ export default {
   bulkUpdateAllowedVendors,
   getRulePolicy,
   deleteUnauthorizedScript,
-  removeUnauthorizedScriptsByKeywordController
+  deleteUnauthorizedScriptsByKeyword
 };

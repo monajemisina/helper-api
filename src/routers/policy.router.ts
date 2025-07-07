@@ -8,7 +8,7 @@ router.put('/policies/:policyId/data-assets/allowed-vendors', PolicyController.b
 router.put('/policies/:policyId/data-assets/allowed-scripts', PolicyController.bulkUpdateAllowedUrls);
 
 router.delete('/policies/:policyId/unauthorized-scripts', PolicyController.deleteUnauthorizedScript);
-router.delete('/policies/:policyId/remove-by-keyword', PolicyController.removeUnauthorizedScriptsByKeywordController);
+router.delete('/policies/:policyId/remove-by-keyword', PolicyController.deleteUnauthorizedScriptsByKeyword);
 
 
 export default router;

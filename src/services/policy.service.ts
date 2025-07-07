@@ -167,7 +167,7 @@ const removeUnauthorizedScriptsByKeyword = async (
   const filteredList = originalList.filter((item: any) => !matcher(item.urlPattern));
 
   if (filteredList.length === originalList.length) {
-    throw new Error(`No unauthorized scripts matched the keyword or matcher.`);
+    throw new Error(`No unauthorized scripts matched the keyword.`);
   }
 
   const payload: Policy = {
