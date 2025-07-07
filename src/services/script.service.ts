@@ -25,23 +25,24 @@ const fetchAllScripts = async (opts: FindScriptsParams): Promise<FindScriptsResu
   let scriptCount: number | undefined;
 
   if (opts.name === 'all') {
-    const names = Array.from(
-      new Set(items.map(s => s.scriptName).filter(Boolean))
-    );
-    scripts = names;
-    scriptCount = names.length;
-  } else if (opts.name) {
-    scripts = items.filter(s =>
-      s.scriptName.toLowerCase().includes(opts.name!.toLowerCase())
-    );
-  } else if (opts.url === 'all') {
-    scripts = items.map(s => s.scriptUrl);
-  } else if (opts.url) {
-    scripts = items.filter(s =>
-      s.scriptUrl.toLowerCase().includes(opts.url!.toLowerCase())
-    );
-  }
-
+  const names = Array.from(
+    new Set(items.map(s => s.scriptName).filter(Boolean))
+  );
+  scripts = names;
+  scriptCount = names.length;
+} else if (opts.name) {
+  const searchTerm = opts.name.toLowerCase();
+  scripts = items.filter(s =>
+    s.scriptName?.toLowerCase().includes(searchTerm)
+  );
+} else if (opts.url === 'all') {
+  scripts = items.map(s => s.scriptUrl);
+} else if (opts.url) {
+  const searchUrl = opts.url.toLowerCase();
+  scripts = items.filter(s =>
+    s.scriptUrl?.toLowerCase().includes(searchUrl)
+  );
+}
   return {
     page: opts.page,
     pageSize: opts.pageSize,
