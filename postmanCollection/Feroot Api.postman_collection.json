@@ -25,8 +25,23 @@
 							],
 							"query": [
 								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "url",
+									"value": "all",
+									"disabled": true
+								},
+								{
 									"key": "name",
 									"value": "all",
+									"disabled": true
+								},
+								{
+									"key": "pageSize",
+									"value": "1000",
 									"disabled": true
 								}
 							]
@@ -45,7 +60,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{homeUrl}}/vendors?name=all",
+							"raw": "{{homeUrl}}/vendors",
 							"host": [
 								"{{homeUrl}}"
 							],
@@ -55,7 +70,8 @@
 							"query": [
 								{
 									"key": "name",
-									"value": "all"
+									"value": "all",
+									"disabled": true
 								}
 							]
 						}
@@ -125,7 +141,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"dataAssetType\": \"email\",\n  \"allowedVendors\": {\n    \"inherit\": false,\n    \"list\": [\n      { \"vendorId\": \"bing_ads\", \"entryMode\": \"allow\" } //allo or deny\n      \n    ],\n    \"scope\": {\n      \"presence\": true,\n      \"read\": true,\n      \"transfer\": false\n    }\n  }\n}\n",
+							"raw": "{\n  \"dataAssetType\": \"first_name\",\n  \"allowedVendors\": {\n    \"inherit\": false,\n    \"list\": [\n      { \"vendorId\": \"microsoft_clarity\", \"entryMode\": \"allow\" }, //allow or deny\n      { \"vendorId\": \"bing_ads\", \"entryMode\": \"deny\" },\n      { \"vendorId\": \"bing_ads\", \"entryMode\": \"deny\" }\n    ],\n    \"scope\": {\n      \"presence\": true,\n      \"read\": true,\n      \"transfer\": false\n    }\n  }\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -148,12 +164,12 @@
 					"response": []
 				},
 				{
-					"name": "Get Policy By Asset Type",
+					"name": "Search Policy",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{homeUrl}}/policies/allowed/{{policyId}}?name=cc_number",
+							"raw": "{{homeUrl}}/policies/allowed/{{policyId}}?issueRule=script",
 							"host": [
 								"{{homeUrl}}"
 							],
@@ -164,8 +180,83 @@
 							],
 							"query": [
 								{
+									"key": "dataAssetType",
+									"value": "search",
+									"disabled": true
+								},
+								{
+									"key": "issueRule",
+									"value": "script"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Unauthorized Script",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"urlPattern\": \"widgets.syfpayments.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{homeUrl}}/policies/{{policyId}}/unauthorized-scripts",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"policies",
+								"{{policyId}}",
+								"unauthorized-scripts"
+							],
+							"query": [
+								{
 									"key": "name",
-									"value": "cc_number"
+									"value": "cc_number",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete unauthorized script by keyword",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"keyword\": \"click\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{homeUrl}}/policies/{{policyId}}/remove-by-keyword",
+							"host": [
+								"{{homeUrl}}"
+							],
+							"path": [
+								"policies",
+								"{{policyId}}",
+								"remove-by-keyword"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "cc_number",
+									"disabled": true
 								}
 							]
 						}
