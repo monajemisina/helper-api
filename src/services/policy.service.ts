@@ -144,9 +144,55 @@ const removeUnauthorizedScripts = async (
   );
   return updated;
 };
+
+const removeUnauthorizedScriptsByKeyword = async (
+  policyId: string,
+  keywordOrMatcher: string | ((url: string) => boolean)
+): Promise<Policy> => {
+  const { data: current } = await apiClient.get<Policy>(`/policies/${policyId}`);
+  const issueRules = current.issueRules || {};
+
+  const unauthorizedScriptsRule = issueRules['unauthorized-scripts'] || {
+    enabled: true,
+    inherit: true,
+    list: [] as DataAssetItem[],
+  };
+
+  const matcher =
+    typeof keywordOrMatcher === 'string'
+      ? (url: string) => url.includes(keywordOrMatcher)
+      : keywordOrMatcher;
+
+  const originalList = unauthorizedScriptsRule.list;
+  const filteredList = originalList.filter((item: any) => !matcher(item.urlPattern));
+
+  if (filteredList.length === originalList.length) {
+    throw new Error(`No unauthorized scripts matched the keyword or matcher.`);
+  }
+
+  const payload: Policy = {
+    ...current,
+    issueRules: {
+      ...issueRules,
+      'unauthorized-scripts': {
+        ...unauthorizedScriptsRule,
+        list: filteredList,
+      },
+    },
+  };
+
+  const { data: updated } = await apiClient.put<Policy>(
+    `/policies/${policyId}`,
+    payload
+  );
+
+  return updated;
+};
+
 export {
   fetchRulePolicy,
   updateAllowedUrlSources,
   updateAllowedVendors,
-  removeUnauthorizedScripts
+  removeUnauthorizedScripts,
+  removeUnauthorizedScriptsByKeyword
 };

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { UpdateAllowedUrlSourcesParams, UpdateAllowedVendorsParams } from '../types/policy.types';
 import * as policyService from '../services/policy.service';
+import { removeUnauthorizedScriptsByKeyword } from '../services/policy.service';
 
 
 const bulkUpdateAllowedUrls = async (req: Request, res: Response) => {
@@ -90,38 +91,50 @@ const getRulePolicy = async (req: Request, res: Response) => {
 
     if (dataAssetType === 'all') {
       const types = dataAccess.map(i => i.dataAssetType);
-      return res
+      res
         .status(200)
         .json({ total: types.length, dataAssetTypes: types });
+      return;
+
     } else if (dataAssetType) {
       const filtered = dataAccess.filter(
         item => item.dataAssetType.toLowerCase() === dataAssetType
       );
       const types = filtered.map(item => item);
-      return res.status(200).send({ dataAccessType: types })
+      res.status(200).send({ dataAccessType: types })
+      return;
+
     }
 
     switch (issueRule) {
       case 'cookie': {
         const unauthorizedCookies = cookies.map(c => c.namePattern);
-        return res
+        res
           .status(200)
           .json({ total: unauthorizedCookies.length, unauthorizedCookies });
+        return;
+
       }
       case 'script': {
         const unauthorizedScripts = scripts.map(s => s.urlPattern);
-        return res
+        res
           .status(200)
           .json({ total: unauthorizedScripts.length, unauthorizedScripts });
+        return;
+
       }
       case 'vendor': {
         const unauthorizedVendors = vendors.map(v => v.vendorId);
-        return res
+        res
           .status(200)
           .json({ total: unauthorizedVendors.length, unauthorizedVendors });
+        return;
+
       }
       default:
-        return res.status(200).json(policy);
+        res.status(200).json(policy);
+        return;
+
     }
 
   } catch (err: any) {
@@ -129,6 +142,8 @@ const getRulePolicy = async (req: Request, res: Response) => {
     res
       .status(err.status || 500)
       .json({ error: err.message || 'Failed to fetch policy' });
+    return;
+
   }
 };
 
@@ -161,9 +176,40 @@ const deleteUnauthorizedScript = async (
   }
 };
 
+const removeUnauthorizedScriptsByKeywordController = async (
+  req: Request,
+  res: Response
+) => {
+  const { policyId } = req.params;
+  const { keyword } = req.body;
+
+  if (!policyId || typeof policyId !== 'string') {
+    res.status(400).json({ error: 'policyId is required in URL and must be a string.' });
+    return;
+  }
+
+  if (!keyword || typeof keyword !== 'string') {
+    res.status(400).json({ error: 'keyword is required in body and must be a string.' });
+    return;
+
+  }
+
+  try {
+    const updatedPolicy = await removeUnauthorizedScriptsByKeyword(policyId, keyword);
+    res.status(200).json({ message: 'Matching scripts removed successfully.', policy: updatedPolicy });
+    return;
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message || 'An unexpected error occurred.' });
+    return;
+
+  }
+};
+
 export default {
   bulkUpdateAllowedUrls,
   bulkUpdateAllowedVendors,
   getRulePolicy,
-  deleteUnauthorizedScript
+  deleteUnauthorizedScript,
+  removeUnauthorizedScriptsByKeywordController
 };
